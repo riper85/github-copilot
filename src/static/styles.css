@@ -123,6 +123,29 @@ section h3 {
   word-break: break-word;
 }
 
+/* Delete (unregister) button shown next to each participant */
+.delete-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #c62828;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background: rgba(198,40,40,0.06);
+}
+
+.participant-email {
+  flex: 1;
+}
+
 .muted {
   color: #777;
   font-style: italic;
