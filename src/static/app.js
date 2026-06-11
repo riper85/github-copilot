@@ -10,8 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch("/activities");
       const activities = await response.json();
 
-      // Clear loading message
+      // Clear loading message and reset activity select options
       activitiesList.innerHTML = "";
+      activitySelect.innerHTML = "";
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "-- Select an activity --";
+      activitySelect.appendChild(defaultOption);
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -28,6 +33,47 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
 
         activitiesList.appendChild(activityCard);
+
+        // Participants section (pretty bulleted list)
+        const participantsContainer = document.createElement("div");
+        participantsContainer.className = "participants-section";
+
+        const participantsTitle = document.createElement("p");
+        participantsTitle.innerHTML = "<strong>Participants:</strong>";
+        participantsContainer.appendChild(participantsTitle);
+
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          const ul = document.createElement("ul");
+          ul.className = "participants-list";
+
+          details.participants.forEach((email) => {
+            const li = document.createElement("li");
+            li.className = "participant";
+
+            const avatar = document.createElement("span");
+            avatar.className = "avatar";
+            // Use the first character of the local-part as an initial
+            const local = (email || "").split("@")[0] || "?";
+            avatar.textContent = local.charAt(0).toUpperCase();
+
+            const spanEmail = document.createElement("span");
+            spanEmail.className = "participant-email";
+            spanEmail.textContent = email;
+
+            li.appendChild(avatar);
+            li.appendChild(spanEmail);
+            ul.appendChild(li);
+          });
+
+          participantsContainer.appendChild(ul);
+        } else {
+          const p = document.createElement("p");
+          p.className = "muted";
+          p.textContent = "No participants yet";
+          participantsContainer.appendChild(p);
+        }
+
+        activityCard.appendChild(participantsContainer);
 
         // Add option to select dropdown
         const option = document.createElement("option");
@@ -62,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh activities to show the newly signed-up participant
+        fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
